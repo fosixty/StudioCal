@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b8860b">
+  <title>Studio Calendar</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-calendar">
+  <header class="app-header">
+    <div>
+      <p class="app-kicker">Recording Studio</p>
+      <h1 class="app-title">Calendar</h1>
+    </div>
+    <div class="header-actions">
+      <p class="engineer-pill" data-engineer-name>Engineer</p>
+      <a class="btn btn-ghost" href="admin.html" data-owner-only hidden>Admin</a>
+      <button class="btn btn-ghost" type="button" data-logout-btn>Log out</button>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <section class="surface">
+      <div class="calendar-toolbar">
+        <div class="calendar-toolbar-main">
+          <button class="btn btn-ghost btn-icon" type="button" id="prev-month" aria-label="Previous month">‹</button>
+          <h2 id="month-label">Month Year</h2>
+          <button class="btn btn-ghost btn-icon" type="button" id="next-month" aria-label="Next month">›</button>
+        </div>
+        <div class="calendar-controls">
+          <button class="btn btn-ghost" type="button" id="today-btn">Today</button>
+          <label class="month-jump-wrap" for="month-jump">Jump</label>
+          <input id="month-jump" class="month-jump" type="month" aria-label="Jump to month">
+        </div>
+        <p class="calendar-hint">Swipe left or right to move month-by-month.</p>
+      </div>
+      <div id="calendar-grid" class="calendar-grid" aria-live="polite"></div>
+
+      <section class="day-agenda" aria-live="polite" aria-labelledby="agenda-title">
+        <div class="agenda-head">
+          <h3 id="agenda-title" class="agenda-title">Selected Day</h3>
+          <p id="agenda-subtitle" class="agenda-subtitle">No date selected</p>
+        </div>
+        <div id="day-events" class="day-events"></div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="js/calendar.js"></script>
+
+  <!-- New booking FAB -->
+  <button class="new-booking-fab" type="button" id="new-booking-fab" aria-label="New booking">+</button>
+
+  <!-- Bottom sheet backdrop -->
+  <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+
+  <!-- Booking detail bottom sheet -->
+  <section id="booking-sheet" class="bottom-sheet" hidden aria-label="Booking detail">
+    <div class="sheet-handle" role="presentation"></div>
+    <div id="sheet-content" class="sheet-content"></div>
+
+    <!-- Default action buttons (shown/hidden per booking state) -->
+    <div id="sheet-actions" class="sheet-actions">
+      <button class="btn btn-primary sheet-action" type="button" id="btn-deposit">Deposit Sent</button>
+      <button class="btn btn-danger sheet-action" type="button" id="btn-cancel-session">Cancel Session</button>
+      <button class="btn btn-ghost sheet-action" type="button" id="btn-confirm-ended">Confirm Session Ended</button>
+    </div>
+
+    <!-- Cancel reason panel (replaces actions) -->
+    <div id="cancel-reason-wrap" class="sheet-section" hidden>
+      <p class="sheet-section-title">Why was this session cancelled?</p>
+      <textarea id="cancel-reason" rows="3" placeholder="Enter a reason…"></textarea>
+      <p id="cancel-error" class="form-error" role="alert" aria-live="polite"></p>
+      <div class="sheet-action-row">
+        <button class="btn btn-ghost" type="button" id="btn-cancel-back">Back</button>
+        <button class="btn btn-danger" type="button" id="btn-cancel-confirm">Confirm Cancel</button>
+      </div>
+    </div>
+
+    <!-- Duration confirm panel (replaces actions) -->
+    <div id="duration-confirm-wrap" hidden>
+      <p class="sheet-question">Did this session run for the originally scheduled time?</p>
+      <div class="sheet-action-row">
+        <button class="btn btn-ghost" type="button" id="btn-duration-no">No, adjust it</button>
+        <button class="btn btn-primary" type="button" id="btn-duration-yes">Yes</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Time adjust full-screen overlay -->
+  <div id="time-adjust-panel" class="time-adjust-panel" hidden>
+    <header class="time-adjust-header">
+      <button class="btn-back-link" type="button" id="btn-time-adjust-cancel">← Cancel</button>
+      <h2>Adjust Session Time</h2>
+    </header>
+    <div class="time-adjust-body">
+      <label class="field-label" for="time-adjust-start">Start time</label>
+      <input id="time-adjust-start" type="time">
+      <label class="field-label" for="time-adjust-end">End time</label>
+      <input id="time-adjust-end" type="time">
+      <p id="time-adjust-error" class="form-error" role="alert" aria-live="polite"></p>
+    </div>
+    <footer class="time-adjust-footer">
+      <button class="btn btn-primary" type="button" id="btn-time-adjust-save">Save &amp; Confirm</button>
+    </footer>
+  </div>
+
+  <script type="module">
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js", { updateViaCache: "none" }).then((registration) => {
+          registration.update();
+        }).catch((error) => {
+          console.error("Service worker registration failed:", error);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

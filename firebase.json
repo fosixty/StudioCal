@@ -1,0 +1,27 @@
+{
+  "hosting": {
+    "site": "your-firebase-hosting-site-id",
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "database.rules.json",
+      "README.md",
+      "skills-lock.json",
+      "**/.*",
+      "**/node_modules/**",
+      ".agents/**"
+    ]
+  },
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Your Studio Name",
+        "supportEmail": "owner@example.com"
+      }
+    }
+  }
+}
