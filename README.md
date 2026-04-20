@@ -1,4 +1,4 @@
-# Studio Calendar PWA
+# StudioCal
 
 A mobile-first Progressive Web App for recording studio engineers to schedule sessions, avoid booking overlap, and manage studio workflow in one shared calendar.
 
