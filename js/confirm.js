@@ -1,8 +1,12 @@
 import { requireAuthAndRenderUser } from "./auth.js";
 import { get, ref, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 import { db } from "./firebase-config.js";
+import { DEMO_MODE, showDemoBanner, withDemoParam } from "./demo-mode.js";
 
 await requireAuthAndRenderUser();
+if (DEMO_MODE) {
+	showDemoBanner("Demo mode: confirmation actions are disabled.");
+}
 
 const loadingEl     = document.getElementById("confirm-loading");
 const confirmView   = document.getElementById("confirm-view");
@@ -90,6 +94,10 @@ if (!bookingId) {
 
 			// Yes — duration confirmed as-is
 			btnYes?.addEventListener("click", async () => {
+				if (DEMO_MODE) {
+					confirmError.textContent = "Demo mode is read-only.";
+					return;
+				}
 				btnYes.disabled = true;
 				btnNo.disabled  = true;
 				confirmError.textContent = "";
@@ -106,7 +114,11 @@ if (!bookingId) {
 
 			// No — go to calendar time-adjust view
 			btnNo?.addEventListener("click", () => {
-				window.location.href = `calendar.html?edit=${bookingId}`;
+				if (DEMO_MODE) {
+					window.location.href = withDemoParam("calendar.html");
+					return;
+				}
+				window.location.href = withDemoParam(`calendar.html?edit=${bookingId}`);
 			});
 		}
 	} catch (err) {

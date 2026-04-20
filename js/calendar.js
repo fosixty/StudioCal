@@ -1,9 +1,13 @@
 import { requireAuthAndRenderUser } from "./auth.js";
+import { DEMO_MODE, getDemoBookings, showDemoBanner, withDemoParam } from "./demo-mode.js";
 
 import { onValue, ref, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 import { db } from "./firebase-config.js";
 
 await requireAuthAndRenderUser();
+if (DEMO_MODE) {
+  showDemoBanner("Demo mode: read-only sample schedule (no sign-in required).");
+}
 
 // ─── State ────────────────────────────────────────────────
 const today = new Date();
@@ -347,21 +351,27 @@ function renderGrid() {
 renderGrid();
 
 // ─── Firebase subscription ────────────────────────────────
-onValue(
-  ref(db, "bookings"),
-  (snapshot) => {
-    allBookings = snapshot.val() || {};
-    rebuildBookingsByDate();
-    renderGrid();
-  },
-  (error) => {
-    console.error("Bookings subscription failed:", error);
-    // Keep the month grid visible even when bookings cannot be loaded.
-    allBookings = {};
-    bookingsByDate = new Map();
-    renderGrid();
-  }
-);
+if (DEMO_MODE) {
+  allBookings = getDemoBookings();
+  rebuildBookingsByDate();
+  renderGrid();
+} else {
+  onValue(
+    ref(db, "bookings"),
+    (snapshot) => {
+      allBookings = snapshot.val() || {};
+      rebuildBookingsByDate();
+      renderGrid();
+    },
+    (error) => {
+      console.error("Bookings subscription failed:", error);
+      // Keep the month grid visible even when bookings cannot be loaded.
+      allBookings = {};
+      bookingsByDate = new Map();
+      renderGrid();
+    }
+  );
+}
 
 // ─── Month nav ────────────────────────────────────────────
 prevBtn?.addEventListener("click", () => {
@@ -431,9 +441,14 @@ setInterval(() => {
 
 // ─── FAB ──────────────────────────────────────────────────
 fabBtn?.addEventListener("click", () => {
+  if (DEMO_MODE) return;
   const dateParam = selectedDate ? `?date=${selectedDate}` : "";
-  window.location.href = `booking.html${dateParam}`;
+  window.location.href = withDemoParam(`booking.html${dateParam}`);
 });
+
+if (DEMO_MODE && fabBtn) {
+  fabBtn.hidden = true;
+}
 
 // ─── Sheet helpers ────────────────────────────────────────
 function hasEndTimePassed(booking) {
@@ -507,12 +522,17 @@ function openSheet(id) {
   btnDurationYes.disabled   = false;
 
   populateSheet(booking);
-  showPanel("actions");
+  showPanel(DEMO_MODE ? "duration" : "actions");
 
   const isCancelled = booking.status === "cancelled";
   btnDeposit.hidden       = booking.depositSent || isCancelled;
   btnCancelSession.hidden = isCancelled;
   btnConfirmEnded.hidden  = isCancelled || booking.durationConfirmed || !hasEndTimePassed(booking);
+
+  if (DEMO_MODE) {
+    durationConfirmWrap.hidden = false;
+    durationConfirmWrap.innerHTML = `<p class="sheet-question">Demo mode is read-only. Sign in to update bookings.</p>`;
+  }
 
   sheetBackdrop.hidden = false;
   bookingSheet.hidden  = false;
@@ -530,6 +550,7 @@ sheetBackdrop?.addEventListener("click", closeSheet);
 
 // ─── Deposit Sent ─────────────────────────────────────────
 btnDeposit?.addEventListener("click", async () => {
+  if (DEMO_MODE) return;
   if (!activeBookingId) return;
   btnDeposit.disabled = true;
   try {
@@ -543,6 +564,7 @@ btnDeposit?.addEventListener("click", async () => {
 
 // ─── Cancel Session ───────────────────────────────────────
 btnCancelSession?.addEventListener("click", () => {
+  if (DEMO_MODE) return;
   showPanel("cancel");
   cancelReasonInput.focus();
 });
@@ -554,6 +576,7 @@ btnCancelBack?.addEventListener("click", () => {
 });
 
 btnCancelConfirm?.addEventListener("click", async () => {
+  if (DEMO_MODE) return;
   const reason = cancelReasonInput.value.trim();
   if (!reason) {
     cancelError.textContent = "A reason is required to cancel this session.";
@@ -575,14 +598,16 @@ btnCancelConfirm?.addEventListener("click", async () => {
 
 // ─── Confirm Session Ended → navigate to confirm.html ─────
 btnConfirmEnded?.addEventListener("click", () => {
+  if (DEMO_MODE) return;
   if (!activeBookingId) return;
-  window.location.href = `confirm.html?id=${activeBookingId}`;
+  window.location.href = withDemoParam(`confirm.html?id=${activeBookingId}`);
 });
 
 // Duration Yes/No are on confirm.html — kept here for direct
 // time-adjust access via btnDurationNo (unreachable via normal
 // flow now but wired if sheet is reused in future)
 btnDurationNo?.addEventListener("click", () => {
+  if (DEMO_MODE) return;
   const booking = allBookings[activeBookingId];
   if (!booking) return;
   timeAdjustStart.value = booking.startTime || "";
@@ -602,6 +627,7 @@ btnTimeAdjustCancel?.addEventListener("click", () => {
 });
 
 btnTimeAdjustSave?.addEventListener("click", async () => {
+  if (DEMO_MODE) return;
   const newStart = timeAdjustStart.value;
   const newEnd   = timeAdjustEnd.value;
   if (!newStart || !newEnd) {

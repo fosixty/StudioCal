@@ -6,6 +6,12 @@ This repository is intentionally published as a reusable public template.
 
 Created by Mitchell Gendron.
 
+## Live Demo
+
+- Demo URL (GitHub Pages): `https://fosixty.github.io/StudioCal/`
+- Demo mode is read-only and does not require Google sign-in.
+- Production mode still uses Firebase Authentication and Realtime Database.
+
 ## Highlights
 
 - Google sign-in with Firebase Authentication.
@@ -43,6 +49,17 @@ This project demonstrates:
    - `npx -y firebase-tools@latest emulators:start --only hosting`
 7. Open:
    - `http://localhost:5000`
+
+## Enable GitHub Pages
+
+1. Open your repo settings: [https://github.com/fosixty/StudioCal/settings/pages](https://github.com/fosixty/StudioCal/settings/pages)
+2. Under **Build and deployment**:
+   - **Source**: `Deploy from a branch`
+   - **Branch**: `main`
+   - **Folder**: `/ (root)`
+3. Save and wait for the Pages deployment to finish.
+4. Your demo will be available at:
+   - `https://fosixty.github.io/StudioCal/`
 
 ## Firebase Config Pattern
 

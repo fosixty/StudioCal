@@ -8,6 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 import { get, ref } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 import { auth, db } from "./firebase-config.js";
+import { DEMO_MODE, DEMO_USER, withDemoParam } from "./demo-mode.js";
 
 const OWNER_EMAILS = new Set([
   "owner@example.com"
@@ -101,7 +102,30 @@ function redirectUnauthorized() {
   window.location.href = "index.html?error=not-allowlisted";
 }
 
+function renderSignedInUser(user) {
+  const fullName = engineerFullName(user);
+  const firstName = engineerFirstName(user);
+
+  document.querySelectorAll("[data-engineer-name]").forEach((el) => {
+    el.textContent = fullName;
+  });
+
+  document.querySelectorAll("[data-engineer-first-name]").forEach((el) => {
+    el.textContent = firstName;
+  });
+
+  const owner = !DEMO_MODE && isOwner(user);
+  document.querySelectorAll("[data-owner-only]").forEach((el) => {
+    el.hidden = !owner;
+  });
+}
+
 export function requireAuthAndRenderUser() {
+  if (DEMO_MODE) {
+    renderSignedInUser(DEMO_USER);
+    return Promise.resolve(DEMO_USER);
+  }
+
   return new Promise((resolve) => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -122,21 +146,7 @@ export function requireAuthAndRenderUser() {
         return;
       }
 
-      const fullName = engineerFullName(user);
-      const firstName = engineerFirstName(user);
-
-      document.querySelectorAll("[data-engineer-name]").forEach((el) => {
-        el.textContent = fullName;
-      });
-
-      document.querySelectorAll("[data-engineer-first-name]").forEach((el) => {
-        el.textContent = firstName;
-      });
-
-      const owner = isOwner(user);
-      document.querySelectorAll("[data-owner-only]").forEach((el) => {
-        el.hidden = !owner;
-      });
+      renderSignedInUser(user);
 
       resolve(user);
     });
@@ -146,6 +156,10 @@ export function requireAuthAndRenderUser() {
 function bindLogoutButtons() {
   document.querySelectorAll("[data-logout-btn]").forEach((button) => {
     button.addEventListener("click", async () => {
+      if (DEMO_MODE) {
+        window.location.href = withDemoParam("index.html");
+        return;
+      }
       try {
         await signOut(auth);
         window.location.href = "index.html";
@@ -163,6 +177,16 @@ async function initIndexPage() {
   }
 
   const errorEl = document.getElementById("login-error");
+  if (DEMO_MODE) {
+    errorEl.textContent = "Demo mode: no login required. Explore calendar in read-only mode.";
+    btn.innerHTML = "Continue to Demo";
+    btn.disabled = false;
+    btn.addEventListener("click", () => {
+      window.location.href = withDemoParam("calendar.html");
+    });
+    return;
+  }
+
   const params = new URLSearchParams(window.location.search);
   if (params.get("error") === "not-allowlisted") {
     errorEl.textContent = "Your account is not approved yet. Ask an admin to add you to the allowlist.";

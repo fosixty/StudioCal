@@ -1089,3 +1089,16 @@ textarea {
   font-size: 0.9rem;
   padding: 0.25rem 0.1rem;
 }
+
+.demo-banner {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  width: 100%;
+  text-align: center;
+  padding: 0.55rem 0.75rem;
+  background: rgba(184, 134, 11, 0.2);
+  border-bottom: 1px solid rgba(184, 134, 11, 0.45);
+  color: #f3d89a;
+  font-size: 0.86rem;
+}

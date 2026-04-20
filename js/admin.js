@@ -1,6 +1,12 @@
 import { onValue, ref, remove, set } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 import { db } from "./firebase-config.js";
 import { isOwner, requireAuthAndRenderUser } from "./auth.js";
+import { DEMO_MODE, withDemoParam } from "./demo-mode.js";
+
+if (DEMO_MODE) {
+  window.location.replace(withDemoParam("calendar.html"));
+  throw new Error("Admin page is unavailable in demo mode.");
+}
 
 // Ensure the session is authenticated before loading admin data.
 const user = await requireAuthAndRenderUser();

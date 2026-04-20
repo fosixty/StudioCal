@@ -1,8 +1,12 @@
 import { get, push, ref, set, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 import { db } from "./firebase-config.js";
 import { engineerFullName, requireAuthAndRenderUser } from "./auth.js";
+import { DEMO_MODE, showDemoBanner, withDemoParam } from "./demo-mode.js";
 
 const user = await requireAuthAndRenderUser();
+if (DEMO_MODE) {
+  showDemoBanner("Demo mode: booking editor is disabled.");
+}
 
 const form = document.getElementById("booking-form");
 const sessionTypeEl = document.getElementById("session-type");
@@ -225,6 +229,11 @@ dateEl?.addEventListener("change", () => {
 let isSubmitting = false;
 
 async function handleBookingSave() {
+  if (DEMO_MODE) {
+    errorEl.textContent = "Demo mode is read-only. Sign in with your Firebase project to create bookings.";
+    return;
+  }
+
   if (isSubmitting) {
     return;
   }
@@ -354,6 +363,13 @@ async function handleBookingSave() {
     setSaveButtonState(false);
     isSubmitting = false;
   }
+}
+
+if (DEMO_MODE) {
+  if (saveButton) saveButton.disabled = true;
+  document.querySelectorAll("a[href='calendar.html']").forEach((link) => {
+    link.setAttribute("href", withDemoParam("calendar.html"));
+  });
 }
 
 form?.addEventListener("submit", async (event) => {

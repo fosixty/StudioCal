@@ -1,4 +1,4 @@
-const CACHE_NAME = "studio-calendar-shell-v18";
+const CACHE_NAME = "studio-calendar-shell-v20";
 
 const APP_SHELL = [
   "./",
@@ -8,6 +8,7 @@ const APP_SHELL = [
   "./confirm.html",
   "./css/style.css",
   "./js/firebase-config.js",
+  "./js/demo-mode.js",
   "./js/auth.js",
   "./js/calendar.js",
   "./js/booking.js",
