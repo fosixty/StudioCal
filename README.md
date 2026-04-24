@@ -8,9 +8,15 @@ Created by Mitchell Gendron.
 
 ## Live Demo
 
-- Demo URL (GitHub Pages): `https://fosixty.github.io/StudioCal/`
-- Demo mode is read-only and does not require Google sign-in.
-- Production mode still uses Firebase Authentication and Realtime Database.
+After you enable GitHub Pages (see below), the read-only demo is served at:
+
+- `https://<your-github-username>.github.io/<your-repo-name>/`
+
+Replace `<your-github-username>` and `<your-repo-name>` with your fork or clone’s owner and repository slug (for example, `acme` and `my-studio-cal` → `https://acme.github.io/my-studio-cal/`).
+
+- On `*.github.io`, demo mode turns on automatically (no Google sign-in).
+- Elsewhere, append `?demo=1` to any page URL to force demo mode, or `?demo=0` on GitHub Pages to test production-style login.
+- Production mode still uses Firebase Authentication and Realtime Database when not in demo mode.
 
 ## Highlights
 
@@ -52,14 +58,13 @@ This project demonstrates:
 
 ## Enable GitHub Pages
 
-1. Open your repo settings: [https://github.com/fosixty/StudioCal/settings/pages](https://github.com/fosixty/StudioCal/settings/pages)
+1. On GitHub, open **your** repository → **Settings** → **Pages** (not someone else’s URL).
 2. Under **Build and deployment**:
    - **Source**: `Deploy from a branch`
-   - **Branch**: `main`
+   - **Branch**: `main` (or your default branch)
    - **Folder**: `/ (root)`
 3. Save and wait for the Pages deployment to finish.
-4. Your demo will be available at:
-   - `https://fosixty.github.io/StudioCal/`
+4. Your site URL follows GitHub’s pattern: `https://<your-github-username>.github.io/<your-repo-name>/`
 
 ## Firebase Config Pattern
 
